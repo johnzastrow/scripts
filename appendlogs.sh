@@ -62,7 +62,7 @@ OPTIONS="Proceed Quit"
                 
               
 ############################
-#  Create the porcess log
+#  Create the process log
 ############################
 echo "" > $dater.append.tlog
 echo "***************************" >> $dater.append.tlog
