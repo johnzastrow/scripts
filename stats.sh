@@ -1,14 +1,11 @@
 #!/bin/sh
 # jcz 2001-10-22
 
-
-
 # variables
 # renaming old logfiles with the yearmonthdaysecond of this script being run
 alogdater=$(date +%Y%m%d%S)_alogbak
 elogdater=$(date +%Y%m%d%S)_elogbak
 statput=$/var/www/html/stats
-
 
 
 # creating name for the log backup uing yearmonthdatesecond of this script being run
@@ -71,4 +68,3 @@ time analog -G +g/home/jcz/config/aster_analog.cfg
 # /usr/local/bin/webalizer -c /home/jcz/nrd_webalizer.conf
 # webalizer -d -f -i -c /home/jcz/nrd_webalizer.conf
 webalizer -c /home/jcz/config/aster_webalizer.conf
-
