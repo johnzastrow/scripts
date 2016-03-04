@@ -47,7 +47,7 @@ echo %backuptime%
 set dbuser=root
 
 :: Password for the database user
-set dbpass=yub.miha
+set dbpass=----
 
 :: Error log path - Important in debugging your issues
 set errorLogPath="c:\MySQLBackups\backupfiles\dumperrors.txt"
