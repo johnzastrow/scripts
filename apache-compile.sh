@@ -2,7 +2,7 @@
 # This is pseudo script to download and install apache and php
 # DO NOT TRY TO RUN IT. JUST RUN THROUGH THE PROCESS MANUALLY
 #
-wget http://apache.mirrors.redwire.net/httpd/httpd-2.2.4.tar.gz
+wget http://apache.mirrors.redwire.net/httpd/httpd-2.2.6.tar.gz
 
 # or lynx http://httpd.apache.org/download.cgi
 gzip -d httpd-2.2.4.tar.gz
