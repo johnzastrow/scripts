@@ -19,6 +19,9 @@ do
     echo "Database: "$db
     echo ${TABLENAMES[@]}
 
+	
+	
+	
 # Step 3: perform an optimize (or other op) for all tables returned
 
         for TABLENAME in ${TABLENAMES[@]}
