@@ -7,10 +7,10 @@ sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt xenial-pgdg main" 
 wget --quiet -O - http://apt.postgresql.org/pub/repos/apt/ACCC4CF8.asc | sudo apt-key add -
 sudo apt-get update
 sudo apt-get install postgresql-9.6
-sudo apt-get install postgresql-9.6-postgis-2.3 postgresql-contrib-9.6
+sudo apt-get install postgresql-9.6-postgis-2.3 postgresql-contrib-9.6 postgis
 
 #to get the commandline tools shp2pgsql, raster2pgsql you need to do this
-sudo apt-get install postgis
+
 sudo -u postgres psql
 CREATE EXTENSION adminpack;
 sudo -u postgres psql
