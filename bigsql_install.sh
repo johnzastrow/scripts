@@ -1,4 +1,6 @@
 #!/bin/sh
+sudo apt update 
+sudo apt upgrade -y
 
 apt list --installed >> verbose_install_packages.txt
 dpkg -l | grep '^ii' | awk '{print $2 " "}' >> installed_packages_list.txt
@@ -9,25 +11,19 @@ apt install -y perl libnet-ssleay-perl openssl libauthen-pam-perl libpam-runtime
 python -c "$(curl -fsSL https://s3.amazonaws.com/pgcentral/install.py)"
 
 
-wget -O webmin.deb https://github.com/johnzastrow/scripts/raw/master/webmin_1.870_all.deb
-
-dpkg -i webmin.deb
-
-
-bigsql/pgc list
+bigsql/pgc list >> pgc_list1.txt
 bigsql/pgc update
-bigsql/pgc list
+bigsql/pgc list >> pgc_list2.txt
 bigsql/pgc install pg10
 pgc install postgis24-pg10
  
-cd bigsql/pg10/
 bigsql/pgc start pg10
-psql
+netstat -plntu
 
 source /home/jcz/bigsql/pg10/pg10.env
 
 psql -f bigsql/pg10/share/doc/postgresql/extension/create_postgis_sample_db.sql
-sudo apt install -y perl libnet-ssleay-perl openssl libauthen-pam-perl libpam-runtime libio-pty-perl apt-show-versions python rrdtool librrds-perl openssh-server python3 python-minimal curl
+
 wget -O webmin.deb https://github.com/johnzastrow/scripts/raw/master/webmin_1.870_all.deb 
  
 sudo dpkg -i webmin.deb
@@ -35,4 +31,55 @@ ifconfig
 sudo apt update
 sudo apt upgrade
 sudo apt autoremove
+
+########## Master - Postresql.conf
+# wal_level = hot_standby
+
+### For the synchronization level, we will use local sync. Uncomment and change value line as below.
+# synchronous_commit = local
+
+### Enable archiving mode and give the archive_command variable a command as value.
+# archive_mode = on
+# archive_command = 'cp %p /var/lib/pgsql/9.6/archive/%f'
+
+# For the 'Replication' settings, uncomment the 'wal_sender' line and change value to 2 (in this tutorial,  
+# we use only 2 servers master and slave), and for the 'wal_keep_segments' value is 10.
+
+max_wal_senders = 2
+wal_keep_segments = 10
+For the application name, uncomment 'synchronous_standby_names' line and change value to 'pgslave01'.
+
+synchronous_standby_names = 'pgslave01'
+
+### Moving on, in the postgresql.conf file, the archive mode is enabled, 
+### so we need to create a new directory for archiving purposes.
+
+# Create a new directory, change its permission, and change the owner to the postgres user.
+
+mkdir -p /home/jcz/bigsql/data/pg10/pg_archive
+chmod 700 /home/jcz/bigsql/data/pg10/pg_archive
+chown -R postgres:postgres /home/jcz/bigsql/data/pg10/pg_archive
+
+### edit pg_hba.conf file.
+
+# Paste configuration below to the end of the line.
+
+## Localhost
+# host    replication     replica          127.0.0.1/32            md5
+ 
+## PostgreSQL Master IP address
+ host    replication     replica          10.0.15.10/32            md5
+ 
+## PostgreSQL SLave IP address
+ host    replication     replica          10.0.15.11/32            md5
+
+## Restart servers
+
+## Next, we need to create a new user with replication privileges. We will create a new user named 'replica'.
+## Login as postgres user, and create a new 'replica' user with password 'aqwe123@'.
+
+su - postgres
+createuser --replication -P replica
+# Enter New Password:
+ 
 
