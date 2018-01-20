@@ -21,6 +21,7 @@ read mediaid
 cd=$(volname /dev/cdrom)
 
 # trims white space after the name always written out by volname
+# just making a change to trigger git commmit
 cdshort=$(echo $cd | sed -e 's/[\n\t\r ]*$//')_$mediaid
 volume=$(echo $cd | sed -e 's/[\n\t\r ]*$//')
 echo "This volname is: "$cd
