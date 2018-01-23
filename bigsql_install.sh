@@ -42,6 +42,9 @@ sudo apt autoremove
 ### 3. Create a backup of the master
 ### 4. Start up the hot standby instance
 
+
+# MASTER
+
 ## sudo -u postgres ensures that the createuser command runs as the user postgres. 
 ## Otherwise, Postgres will try to run the command by using peer authentication, which means the command will run under your Ubuntu user account. 
 ## This account probably doesn't have the right privileges to create the new user, which would cause an error.
@@ -53,11 +56,19 @@ sudo apt autoremove
 
 sudo -u postgres createuser -U postgres repuser -P -c 5 --replication
 
-########## Master - Postresql.conf
+########## Postresql.conf
 ## Enable archiving mode and give the archive_command variable a command as value.
+## listen_addresses = 'localhost,IP_address_of_THIS_host'
+## wal_level = 'hot_standby'
+## archive_mode = on
+## archive_command = 'cd .'
+## max_wal_senders = 1
+## hot_standby = on
+
+
  archive_mode = on
  archive_command = 'cp %p /var/lib/pgsql/9.6/archive/%f' or archive_command = 'test ! -f mnt/server/archivedir/%f && cp %p mnt/server/archivedir/%f'
- wal_level = hot_standby
+ wal_level = 'hot_standby'
 
 ## For the synchronization level, we will use local sync. Uncomment and change value line as below.
 ### synchronous_commit = local
@@ -70,7 +81,6 @@ sudo -u postgres createuser -U postgres repuser -P -c 5 --replication
 max_wal_senders = 2
 wal_keep_segments = 10
 For the application name, uncomment 'synchronous_standby_names' line and change value to 'pgslave01'.
-
 synchronous_standby_names = 'pgslave01'
 
 ## In the postgresql.conf file, the archive mode is enabled, so we need to create a new directory for archiving purposes.
@@ -90,10 +100,11 @@ chown -R postgres:postgres /home/jcz/bigsql/data/pg10/pg_archive
 ## Localhost
  host    replication     replica          127.0.0.1/32            md5
  
-## PostgreSQL Master IP address
- host    replication     replica          10.0.15.10/32            md5
+## pg_hba.conf for MASTER
+ host    replication     repuser         0.0.0.0/0               md5
  
 ## PostgreSQL SLave IP address
+# host    replication     rep     IP_address_of_slave/32   md5
  host    replication     replica          10.0.15.11/32            md5
 
 ## Restart servers
@@ -104,5 +115,53 @@ chown -R postgres:postgres /home/jcz/bigsql/data/pg10/pg_archive
 su - postgres
 createuser --replication -P replica
 # Enter New Password:
+
+pg_basebackup -D hotstandby2 -w -R --xlog-method=stream --dbname="host=master user=postgres"
+
+or
+pg_basebackup -h '192.168.111.129' -D /home/jcz/bigsql/data -U repuser -v -P -x=stream
+
+# SLAVE or STANDBY
+
+nano postgresql.conf
+
+hot_standby = on
+
+cp -avr recovery.conf.sample recovery.conf
+nano recovery.conf
+
+In the STANDBY SERVER PARAMETERS section, change the standby mode:
+
+standby_mode = on
+
+Set the connection string to the primary server. Replace with the external IP address of the primary server. Replace with the password for the user named repuser.
+
+primary_conninfo = 'host= port=5432 user=repuser password='
+
+
+(Optional) Set the trigger file location:
+
+trigger_file = '/tmp/postgresql.trigger.5432'
+
+The trigger_file path that you specify is the location where you can add a file when you want the system to fail over to the standby server. The presence of the file "triggers" the failover. Alternatively, you can use the pg_ctl promote command to trigger failover.
+
+nano pg_hba.conf  on standby
+
+host    replication     rep     IP_address_of_master/32  md5
+
+
+Start the standby server
+You now have everything in place and are ready to bring up the standby server. In the terminal for the standby server, enter the following command:
+
+service postgresql start
+
+
+SELECT client_hostname, client_addr
+    , pg_xlog_location_diff(pg_stat_replication.sent_location, pg_stat_replication.replay_location) AS byte_lag 
+FROM pg_stat_replication;
+
+
+
  
+
 
