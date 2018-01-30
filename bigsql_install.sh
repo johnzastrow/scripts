@@ -44,7 +44,7 @@ sudo apt autoremove
 ### 5. Test the hot standby instance
 
 
-# MASTER
+# ----------- MASTER ----------- 
 
 ## sudo -u postgres ensures that the createuser command runs as the user postgres. 
 
@@ -55,7 +55,7 @@ sudo apt autoremove
 
 sudo -u postgres createuser -U postgres repuser -P -c 5 --replication
 
-########## Edit Postresql.conf for MASTER
+########## Edit Postresql.conf for MASTER for a small testing VM
 ### Enable archiving mode and give the archive_command variable a command as value.
 ### listen_addresses = 'localhost,IP_address_of_THIS_host'
 ### wal_level = 'hot_standby'
@@ -66,11 +66,11 @@ sudo -u postgres createuser -U postgres repuser -P -c 5 --replication
 ### synchronous_commit = local
 
 listen_addresses = '*'                  # what IP address(es) to listen on; 
-port = 5432                             # (change requires restart)
-max_connections = 100                   # (change requires restart)
-shared_buffers = 128MB                  # min 128kB
+port = 5432 
+max_connections = 100 
+shared_buffers = 128MB 
 maintenance_work_mem = 64MB
-dynamic_shared_memory_type = posix      # the default is the first option
+dynamic_shared_memory_type = posix  
 wal_level = hot_standby
 archive_mode = on
 archive_command = 'test ! -f /home/jcz/bigsql/data/pg10/archivedir/%f && cp %p /home/jcz/bigsql/data/pg10/archivedir/%f'
@@ -78,21 +78,9 @@ max_wal_senders = 2
 wal_keep_segments = 10
 max_replication_slots = 5
 synchronous_commit = local
-
 synchronous_standby_names = 'walreceiver'       # standby servers that provide sync rep
-                                # method to choose sync standbys, number of sync standbys,
-                                # and comma-separated list of application_name
-                                # from standby(s); '*' = all
-
-# This is used when logging to stderr:
 logging_collector = on
-                                        # into log files. Required to be on for
-                                        # csvlogs.
-                                        # (change requires restart)
-
-# These are only used if logging_collector is on:
 log_directory = '/home/jcz/bigsql/data/logs/pg10'
-                                        # can be absolute or relative to PGDATA
 log_filename = 'postgresql-%a.log'
 
 ## In the postgresql.conf file, the archive mode is enabled, so we need to create a new directory for archiving purposes.
@@ -108,66 +96,66 @@ chown -R postgres:postgres /home/jcz/bigsql/data/pg10/pg_archive
 
 ## Paste configuration below to the end of the line.
 ## After the example replication entries, add the following lines. Replace `` with the external IP address of the standby server:
-
-## Localhost
- host    replication     replica          127.0.0.1/32            md5
  
 ## pg_hba.conf for MASTER
- host    replication     repuser         0.0.0.0/0               md5
- 
-## PostgreSQL SLave IP address
-# host    replication     rep     IP_address_of_slave/32   md5
- host    replication     replica          10.0.15.11/32            md5
+# Allow replication connections
+host    replication     repuser       192.168.111.0/23          md5
+
 
 ## Restart servers
 
-## Next, we need to create a new user with replication privileges. We will create a new user named 'replica'.
-## Login as postgres user, and create a new 'replica' user with password 'aqwe123@'.
+## Create a user with replication privileges, named 'replica'.
+## Login as postgres user, and create a new 'replica' user with password 'goodpasswordhere'.
 
 su - postgres
 createuser --replication -P replica
-# Enter New Password:
+#### Enter New Password:
 
-pg_basebackup -D hotstandby2 -w -R --xlog-method=stream --dbname="host=master user=postgres"
+## Copy the system files from the master into the standby slave. Or clone the VM to create the standby slave.
 
-or
 pg_basebackup -h '192.168.111.129' -D /home/jcz/bigsql/data -U repuser -v -P -x=stream
 
-# SLAVE or STANDBY
+# -----------  STANDBY SLAVE ----------- 
 
 nano postgresql.conf
-
+set 
 hot_standby = on
 
+
+## Then create recovery.conf
 cp -avr recovery.conf.sample recovery.conf
 nano recovery.conf
 
-In the STANDBY SERVER PARAMETERS section, change the standby mode:
-
+## make it look like this 
 standby_mode = on
-
-Set the connection string to the primary server. Replace with the external IP address of the primary server. Replace with the password for the user named repuser.
-
-primary_conninfo = 'host= port=5432 user=repuser password='
+primary_conninfo = 'host=192.168.111.129 port=5432 user=repuser password=goodpasswordhere application_name=walreceiver'         
+restore_command = 'cp /home/jcz/bigsql/data/pg10/archivedir/%f %p'
 
 
-(Optional) Set the trigger file location:
+## (Optional) Set the trigger file location. The trigger_file path that you specify is the location where you can add a file when you want the system to fail over to the standby server. The presence of the file "triggers" the failover. Alternatively, you can use the pg_ctl promote command to trigger failover.
 
 trigger_file = '/tmp/postgresql.trigger.5432'
 
-The trigger_file path that you specify is the location where you can add a file when you want the system to fail over to the standby server. The presence of the file "triggers" the failover. Alternatively, you can use the pg_ctl promote command to trigger failover.
 
+## Update pg_hba
 nano pg_hba.conf  on standby
 
-host    replication     rep     IP_address_of_master/32  md5
+host    replication     rep     IP_address_of_master/23  md5
 
 
-Start the standby server
-You now have everything in place and are ready to bring up the standby server. In the terminal for the standby server, enter the following command:
+### Start or reload the standby server
 
-service postgresql start
+./pgc start pg10
+./pgc reload pg10
 
 
+### Start or reload the master server
+
+./pgc start pg10
+./pgc reload pg10
+
+
+### Check the status 
 SELECT client_hostname, client_addr
     , pg_xlog_location_diff(pg_stat_replication.sent_location, pg_stat_replication.replay_location) AS byte_lag 
 FROM pg_stat_replication;
