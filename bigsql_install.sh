@@ -101,7 +101,7 @@ chown -R postgres:postgres /home/jcz/bigsql/data/pg10/pg_archive
 # Allow replication connections
 host    replication     repuser       192.168.111.0/23          md5
 
-
+###############################
 ## Restart servers
 
 ## Create a user with replication privileges, named 'replica'.
