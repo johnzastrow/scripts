@@ -116,6 +116,8 @@ createuser --replication -P replica
 pg_basebackup -h '192.168.111.129' -D /home/jcz/bigsql/data -U repuser -v -P -x=stream
 
 # -----------  STANDBY SLAVE ----------- 
+#######
+
 
 nano postgresql.conf
 set 
