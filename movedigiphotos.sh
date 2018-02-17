@@ -18,8 +18,8 @@
 
 # Defaults
 TOOLS=(exiftool jq) # Also change settings below if changing this, the output should be in the format YYYY:MM:DD
-DEFAULTDIR='/Users/jvhaarst/Pictures/van camera/van camera'
-MAXDEPTH=-maxdepth 1
+DEFAULTDIR='/cygdrive/E:/OLDPICS'
+MAXDEPTH=-maxdepth 2
 #MAXDEPTH=''
 # activate debugging from here
 #set -o xtrace
@@ -42,7 +42,7 @@ IFS=$(echo -en "\n\b")
 # Use BASEDIR from commandline, or default if none given  
 BASEDIR=${1:-$DEFAULTDIR}
 
-for FILE in $(find $(pwd -P) $MAXDEPTH -not -wholename "*._*" -iname "*.JPG" -or -iname "*.JPEG" -or -iname "*.CRW" -or -iname "*.THM" -or -iname "*.RW2" -or -iname '*.ARW' -or -iname "*AVI" -or -iname "*MOV" -or -iname "*MP4"  -or -iname "*MTS" -or -iname "*PNG") 
+for FILE in $(find $(pwd -P) $MAXDEPTH -not -wholename "*._*" -iname "*.JPG" -or -iname "*.JPEG" -or -iname "*.CRW" -or -iname "*.THM" -or -iname "*.RW2" -or -iname '*.ARW' -or -iname "*AVI" -or -iname "*MOV" -or -iname "*MP4"  -or -iname "*MTS" -or -iname "*DNG") 
 do
 	INPUT=${FILE}
 	DATE=$(exiftool -quiet -tab -dateformat "%Y:%m:%d" -json -DateTimeOriginal "${INPUT}" | jq --raw-output '.[].DateTimeOriginal')
