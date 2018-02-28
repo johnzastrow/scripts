@@ -1,0 +1,12 @@
+git config --global user.name johnzastrow
+git config --global user.email br8kwall@gmail.com
+git config --system core.editor nano
+git config --global alias.addall add *
+
+git log
+git status
+git add *
+git diff --staged
+git commit -m "message"
+git branch
+
