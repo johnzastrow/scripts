@@ -56,3 +56,7 @@ sudo apt update
 sudo apt upgrade
 sudo apt autoremove
 sudo apt clean
+
+jcz@raspberrypi:~/Documents/github/weather/dumps $ crontab -l
+@daily /home/jcz/Documents/github/weather/fetchweather.sh #fetchweather
+13 7 * * * /home/jcz/Documents/github/weather/dbbak.sh #database backup
