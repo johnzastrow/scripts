@@ -1,0 +1,16 @@
+--2018-03-13 13:01:49--  https://downloads.sourceforge.net/project/webminstats/Sysstats/2.17/sysstats-2.17.tgz?r=https%3A%2F%2Fsourceforge.net%2Fprojects%2Fwebminstats%2Ffiles%2FSysstats%2F2.17%2Fsysstats-2.17.tgz%2Fdownload
+Resolving downloads.sourceforge.net (downloads.sourceforge.net)... 216.105.38.13
+Connecting to downloads.sourceforge.net (downloads.sourceforge.net)|216.105.38.13|:443... connected.
+HTTP request sent, awaiting response... 302 Found
+Location: https://versaweb.dl.sourceforge.net/project/webminstats/Sysstats/2.17/sysstats-2.17.tgz [following]
+--2018-03-13 13:01:49--  https://versaweb.dl.sourceforge.net/project/webminstats/Sysstats/2.17/sysstats-2.17.tgz
+Resolving versaweb.dl.sourceforge.net (versaweb.dl.sourceforge.net)... 104.238.205.251
+Connecting to versaweb.dl.sourceforge.net (versaweb.dl.sourceforge.net)|104.238.205.251|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 602824 (589K) [application/octet-stream]
+Saving to: ‘sysstats-2.17.tgz?r=https%3A%2F%2Fsourceforge.net%2Fprojects%2Fwebminstats%2Ffiles%2FSysstats%2F2.17%2Fsysstats-2.17.tgz%2Fdownload’
+
+                          sysstats-2.17.tgz?r=https%   0%[                                                                                                                      ]       0  --.-KB/s                                        sysstats-2.17.tgz?r=https%3  28%[================================>                                                                                     ] 167.75K   569KB/s                                       sysstats-2.17.tgz?r=https%3A  47%[=======================================================>                                                              ] 279.75K   559KB/s               sysstats-2.17.tgz?r=https%3A%2F%2Fsourceforge.net%2F 100%[=====================================================================================================================>] 588.70K   965KB/s    in 0.6s    
+
+2018-03-13 13:01:51 (965 KB/s) - ‘sysstats-2.17.tgz?r=https%3A%2F%2Fsourceforge.net%2Fprojects%2Fwebminstats%2Ffiles%2FSysstats%2F2.17%2Fsysstats-2.17.tgz%2Fdownload’ saved [602824/602824]
+

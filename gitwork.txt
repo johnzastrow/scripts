@@ -3,10 +3,16 @@ git config --global user.email br8kwall@gmail.com
 git config --system core.editor nano
 git config --global alias.addall add *
 
-git log
+git log --oneline
+git log --stat
 git status
 git add *
 git diff --staged
 git commit -m "message"
 git branch
 
+cd ~/.ssh
+eval $(ssh-agent -s)
+ssh-add ~/.ssh/id_rsa
+clip < ~/.ssh/id_rsa.pub
+<paste into new SSH key at Github>
